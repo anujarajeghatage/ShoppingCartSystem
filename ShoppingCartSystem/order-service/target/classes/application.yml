@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: order-service
+  data:
+   mongodb:
+      uri: mongodb+srv://Devarajjoel1725:1725@cluster0.nzlbkfw.mongodb.net/shoppingcart?retryWrites=true&w=majority
+      database: shoppingcart
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+server:
+  port: 8084
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8080/eureka
+  instance:
+    prefer-ip-address: true
+
+springdoc:
+  swagger-ui:
+    path: /order-service-swagger.html
+  operationsSorter: method

@@ -1,0 +1,93 @@
+package com.shopping.orderservice.service;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import com.shopping.orderservice.dao.OrderRepository;
+import com.shopping.orderservice.entity.Order;
+
+import lombok.AllArgsConstructor;
+import lombok.Synchronized;
+
+@Service
+@AllArgsConstructor
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+
+    public Order placeOrder(Order order) {
+        order.setOrderDate(Instant.now());
+        order.setOrderId(getNextId());
+        order.setPaidAt(null);
+        order.setIsPaid(false);
+        return orderRepository.save(order);
+    }
+
+    public void changeOrderStatus(int orderId, String status) {
+        Optional<Order> byOrderId = orderRepository.findByOrderId(orderId);
+
+        if (byOrderId.isEmpty()) 
+        	throw new NoSuchElementException("order not found");
+        
+        Order order = byOrderId.get();
+        order.setOrderStatus(status);
+        order.setIsPaid(true);
+        order.setPaidAt(Instant.now());
+        orderRepository.save(order);
+        
+
+    }
+    public void deleteOrder(int orderId) {
+        Optional<Order> byOrderId = orderRepository.findByOrderId(orderId);
+        if(byOrderId.isEmpty())
+        	throw new NoSuchElementException("Order not found");
+        orderRepository.deleteByOrderId(orderId);
+    }
+    public List<Order> getAllOrders() {
+    	List<Order> list = orderRepository.findAll();
+    	if(list.isEmpty())
+        	throw new NoSuchElementException("Order not found");
+        return list; 
+    }
+    public Optional<Order> getOrderById(int orderId) {
+    	Optional<Order> order = orderRepository.findByOrderId(orderId);
+    	if(order.isEmpty())
+        	throw new NoSuchElementException("Order not found");
+        return order;
+    }
+    public List<Order> getOrderByCustomerId(String customerId) {
+    	List<Order> list = orderRepository.findByCustomerId(customerId);
+    	if(list.isEmpty())
+        	throw new NoSuchElementException("Order not found");
+        return list;
+    }
+
+    public Order getLatestOrder() {
+        return orderRepository.findTopByOrderByOrderDateDesc();
+    }
+
+    @Synchronized
+    public int getNextId() {
+        Order order = orderRepository.findTopByOrderByOrderIdDesc();
+        int id = (order != null) ? order.getOrderId() : 0;
+        return ++id;
+    }
+
+    public Optional<Order> findById(String id) {
+    	Optional<Order> order = orderRepository.findById(id);
+    	if(order.isEmpty())
+        	throw new NoSuchElementException("Order not found");
+        return orderRepository.findById(id);
+    }
+
+	public Optional<Order> getByOrderId(int orderId) { 
+		Optional<Order> order = orderRepository.findByOrderId(orderId);
+    	if(order.isEmpty())
+        	throw new NoSuchElementException("Order not found");
+		return orderRepository.findByOrderId(orderId);
+	}
+}

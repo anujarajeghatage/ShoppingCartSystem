@@ -1,0 +1,96 @@
+package com.shopping.productservice.entity;
+
+import java.util.Date;
+import java.util.List;
+
+import javax.validation.constraints.NotBlank;
+
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.MongoId;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Document(collection = "product")
+@NoArgsConstructor
+@AllArgsConstructor 
+@Builder
+public class Product {
+	
+	
+    public Product(String _id, @NotBlank int productId, @NotBlank String name, @NotBlank String image,
+			@NotBlank String brand, @NotBlank String description, @NotBlank String category,
+			@NotBlank Integer numReviews, @NotBlank Double price, @NotBlank Integer countInStock) {
+		super();
+		this._id = _id;
+		this.productId = productId;
+		this.name = name;
+		this.image = image;
+		this.brand = brand;
+		this.description = description;
+		this.category = category;
+		this.numReviews = numReviews;
+		this.price = price;
+		this.countInStock = countInStock;
+	}
+
+	@Id
+    private String _id; 
+    @NotBlank
+    private int productId;
+
+    @NotBlank
+    private String name;
+    @NotBlank
+    private String image;
+    @NotBlank
+    private String brand;
+    @NotBlank
+    private String description;
+    @NotBlank
+    private String category;
+    @NotBlank
+    private Integer numReviews = 0;
+    @NotBlank
+    private Double price = 0.0;
+    @NotBlank
+    private Integer countInStock = 0;
+
+    private List<Review> reviews;
+    @NotBlank
+    private Double rating = 0.0;
+    @NotBlank
+    private String user;
+    @CreatedDate
+    private Date createdAt;
+    @LastModifiedDate
+    private Date updatedAt;
+
+    @Data
+    public static class Review {
+
+        @MongoId
+        private String _id;
+        private String name;
+        private Double rating = 0.0;
+        private String comment;
+        private String user;
+        @CreatedDate
+        private Date createdAt;
+        @LastModifiedDate
+        private Date updatedAt;
+
+        public Review() {
+            this._id = ObjectId.get().toHexString();
+            this.setCreatedAt(new Date());
+        }
+    }
+
+}

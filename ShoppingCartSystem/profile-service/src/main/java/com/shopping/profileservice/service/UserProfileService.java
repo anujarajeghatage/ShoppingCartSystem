@@ -1,0 +1,90 @@
+package com.shopping.profileservice.service;
+
+import lombok.AllArgsConstructor;
+import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.shopping.profileservice.dao.UserProfileRepository;
+import com.shopping.profileservice.entity.UserProfile;
+
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+@Service
+@AllArgsConstructor 
+public class UserProfileService {
+
+	@Autowired
+    private final UserProfileRepository userProfileRepository;
+
+    public UserProfile addNewUserProfile(UserProfile userProfile) {
+        userProfile.setProfileId(getNextId());
+        return userProfileRepository.save(userProfile);
+    }
+
+    public UserProfile login(Map<String, String> userProfile) {
+        return userProfileRepository.findByEmailAndPassword(userProfile.get("email"), userProfile.get("password"))
+                .get();
+    }
+    public List<UserProfile> getAllUserProfiles() {
+    	List<UserProfile> list = userProfileRepository.findAll();
+    	if(list.isEmpty())
+    		 throw new NoSuchElementException();
+        return list;
+    }
+    public UserProfile getByProfileId(int profileId) {
+    	Optional<UserProfile> byProfileId = userProfileRepository.findByProfileId(profileId);
+        if (byProfileId.isPresent())  
+        	return userProfileRepository.findByProfileId(profileId).orElse(UserProfile.builder().build());
+        throw new NoSuchElementException();
+    }
+
+    public UserProfile getByMobileNumber(long mobileNumber) {
+    	Optional<UserProfile> byMobileNo = userProfileRepository.findByMobileNumber(mobileNumber);
+        if (byMobileNo.isPresent())  
+        	return userProfileRepository.findByMobileNumber(mobileNumber).orElse(UserProfile.builder().build());
+        throw new NoSuchElementException();
+    }
+
+    public UserProfile getByUserName(String fullName) {
+    	Optional<UserProfile> byUserName = userProfileRepository.findByFullName(fullName);
+        if (byUserName.isPresent())     	
+        	return userProfileRepository.findByFullName(fullName).orElse(UserProfile.builder().build());
+        throw new NoSuchElementException();
+    }
+
+    public void updateUserProfile(UserProfile userProfile) {
+        Optional<UserProfile> byProfileId = userProfileRepository.findByProfileId(userProfile.getProfileId());
+       
+        if (byProfileId.isPresent()) {
+            userProfile.set_id(byProfileId.get().get_id());
+            userProfileRepository.save(userProfile);
+        }else { 
+        throw new NoSuchElementException();
+        }
+    }
+
+    public void deleteUserProfile(int profileId) { 
+    Optional<UserProfile> byProfileId = userProfileRepository.findByProfileId(profileId);
+         if (byProfileId.isEmpty()) 
+        	 throw new NoSuchElementException();
+       	 userProfileRepository.deleteByProfileId(profileId);  
+             }
+
+    @Synchronized
+    public int getNextId() {
+        UserProfile profile = userProfileRepository.findTopByOrderByProfileIdDesc();
+        int id = (profile != null) ? profile.getProfileId() : 0;
+        return ++id;
+    }
+
+    public boolean existsByEmail(String email) {
+        return userProfileRepository.existsByEmail(email);
+    }
+ 
+}

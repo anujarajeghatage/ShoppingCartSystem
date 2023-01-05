@@ -1,0 +1,105 @@
+package com.shopping.productservice.service;
+
+import lombok.AllArgsConstructor;
+import lombok.Synchronized;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import com.shopping.productservice.dao.ProductRepository;
+import com.shopping.productservice.entity.Product;
+import com.shopping.productservice.entity.TopProductRes;
+
+import java.security.NoSuchProviderException;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+@Service
+@AllArgsConstructor
+@Slf4j
+public class ProductService {
+
+    private final ProductRepository productRepository;
+
+    public Product addProduct(Product product) {
+        product.setProductId(getNextId());
+        return productRepository.save(product);
+    }
+
+    public Product updateProduct(Product product) {
+        Optional<Product> byProductId = productRepository.findByProductId(product.getProductId());
+        if (byProductId.isPresent()) {
+            product.set_id(byProductId.get().get_id());
+            return productRepository.save(product);
+        } else {
+            throw  new NoSuchElementException("product not found");
+        }
+    }
+
+    public void deleteProductById(int productId) {
+        Optional<Product> byProductId = productRepository.findByProductId(productId);
+        if (byProductId.isEmpty())
+     		 throw new NoSuchElementException("product not found");
+           productRepository.deleteById(byProductId.get().get_id());
+    }
+    public List<Product> getAllProducts() {
+    	List<Product> allProducts = productRepository.findAll();
+      	 if(allProducts.isEmpty())
+      		 throw new NoSuchElementException("product not found");
+          return allProducts;    
+    }
+
+    public Page<Product> getAllProducts(Pageable pageable) {
+        return productRepository.findAll(pageable);
+    }
+    public List<Product> getProductsByCategory(String category) {
+    	List<Product> byCategory = productRepository.findByCategory(category);
+   	 if(byCategory.isEmpty())
+   		 throw new NoSuchElementException("product not found");
+       return byCategory;   
+    }
+
+    public Optional<Product> getProductById(int productId) {
+    	 Optional<Product> byProductId = productRepository.findByProductId(productId);
+    	 if(byProductId.isEmpty())
+    		 throw new NoSuchElementException("product not found");
+        return byProductId;  
+    }
+
+    public Optional<Product> getProductByName(String productName) {
+    	 Optional<Product> byName = productRepository.findByName(productName);
+    	 if(byName.isEmpty())
+    		 throw new NoSuchElementException("product not found");
+        return byName; 
+    }
+
+    @Synchronized
+    public int getNextId() {
+        Product product = productRepository.findTopByOrderByProductIdDesc();
+        int id = (product != null) ? product.getProductId() : 0;
+        return ++id;
+    }
+
+    public Stream<TopProductRes> getTopProducts() {
+        return productRepository.getTopProducts();
+    }
+
+    public Page<Product> findAllByQ(String key, Pageable pageable) {
+        return productRepository.findAllByQ(key, pageable);
+    }
+
+    public Optional<Product> findById(String id) {
+    	 Optional<Product> byid = productRepository.findById(id);
+    	 if(byid.isEmpty())
+    		 throw new NoSuchElementException("product not found");
+        return byid;
+    }
+
+	public void deleteById(String id) {  
+		productRepository.deleteById(id); 
+		
+	}
+}

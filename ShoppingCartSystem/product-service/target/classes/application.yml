@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: product-service
+  cloud:
+    client:
+      hostname: localhost
+    gateway:
+      discovery:
+        locator:
+          lower-case-service-id: true
+          enabled: true
+  jackson:
+    default-property-inclusion: NON_NULL
+  data:
+    mongodb:
+      uri: mongodb+srv://Devarajjoel1725:1725@cluster0.nzlbkfw.mongodb.net/shoppingcart?retryWrites=true&w=majority
+      database: shoppingcart
+  mvc:
+    pathmatch:
+      matching-strategy: ant-path-matcher
+
+
+server:
+  port: 8083
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8080/eureka
+  instance:
+    hostname: localhost
+    preferIpAddress: true
+    intance-id: ${spring.cloud.client.hostname}:${spring.application.name}:${server.port}
+
+springdoc:
+  swagger-ui:
+    path: /product-service-swagger.html
+  operationsSorter: method

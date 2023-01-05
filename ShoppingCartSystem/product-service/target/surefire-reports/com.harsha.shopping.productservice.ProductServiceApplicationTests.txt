@@ -1,0 +1,7 @@
+-------------------------------------------------------------------------------
+Test set: com.harsha.shopping.productservice.ProductServiceApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.346 s <<< FAILURE! - in com.harsha.shopping.productservice.ProductServiceApplicationTests
+com.harsha.shopping.productservice.ProductServiceApplicationTests  Time elapsed: 0.343 s  <<< ERROR!
+java.lang.IllegalStateException: Unable to find a @SpringBootConfiguration, you need to use @ContextConfiguration or @SpringBootTest(classes=...) with your test
+
